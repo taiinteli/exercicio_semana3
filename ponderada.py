@@ -64,21 +64,24 @@ class RobotController(Node):
         
         # Cria a mensagem de velocidade a ser publicada
         speed = Twist()
-        
-        # Se a distância em x e y for menor que a distância máxima permitida,
-        # o robô considera que chegou no ponto e passa para o próximo
+
+        # Verifica se o robô está próximo o suficiente do objetivo em x e y
         if abs(inc_x) < MAX_DIFF and abs(inc_y) < MAX_DIFF:
+            # Se o robô estiver próximo o suficiente, passa para o próximo ponto da lista de pontos
             self.current_point_index = (self.current_point_index + 1) % len(self.point_list)
             
+        # Verifica se o robô está alinhado corretamente com o objetivo
         if abs(angle_to_goal - self.theta) > MAX_DIFF:
-            speed.linear.x = 0.0
-            speed.angular.z = 0.5 if angle_to_goal - self.theta > 0.0 else -0.5
+            # Se o robô não estiver alinhado corretamente, gira em direção ao objetivo
+            speed.linear.x = 0.0  # velocidade linear 0
+            speed.angular.z = 0.5 if angle_to_goal - self.theta > 0.0 else -0.5  # velocidade angular para girar em direção ao objetivo
         else:
-            speed.linear.x = 0.3
-            speed.angular.z = 0.0
-        
+            # Se o robô estiver alinhado corretamente, move em direção ao objetivo
+            speed.linear.x = 0.3  # velocidade linear para avançar em direção ao objetivo
+            speed.angular.z = 0.0  # velocidade angular 0
+            
+        # Publica a velocidade do robô
         self.publisher.publish(speed)
-
 
 def main(args=None):
     rclpy.init(args=args)
